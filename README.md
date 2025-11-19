@@ -25,3 +25,5 @@ A trade tracker using coinbase advanced api
 ## Usage
 - Modify the `start_date` and `end_date` variables in `get_filled_history.py` to specify the date range for fetching trade history.
 - The filled trade history will be saved in the `trade_history` directory as a JSON file.
+- Modify the `range` variable in `calculate_profit_history.py` to specify the date range for profit calculation.
+- The profit history will be saved in the `profit_history` directory as a JSON file.
