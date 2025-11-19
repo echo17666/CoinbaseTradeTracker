@@ -1,2 +1,2 @@
 # CoinbaseTradeTracker
-A tade tracker using coinbase advanced api
+A trade tracker using coinbase advanced api
