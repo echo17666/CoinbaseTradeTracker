@@ -6,7 +6,13 @@ from datetime import datetime, timezone
 from utils import build_jwt
 
 
-def get_filled_history(start_date, end_date):
+def get_filled_history(start_date, end_date=None):
+    # alltime condition
+    isAllTime=False
+    if start_date=="alltime":
+        isAllTime=True
+        start_date="2020-01-01"
+        end_date="3020-01-01"
     request_method = "GET"
     request_host   = "api.coinbase.com"
     request_path   = "/api/v3/brokerage/orders/historical/fills"
@@ -25,6 +31,8 @@ def get_filled_history(start_date, end_date):
     start_iso = start_dt.isoformat(timespec='microseconds').replace('+00:00', 'Z')
     end_iso = end_dt.isoformat(timespec='microseconds').replace('+00:00', 'Z')
     querystring = {"sort_by":"TRADE_TIME","start_sequence_timestamp":start_iso,"end_sequence_timestamp":end_iso}
+    if isAllTime:
+        querystring = {"limit":"2000"}
     response = requests.get(url, headers=headers,params=querystring)
     response=response.json()
     trade_history=[]
@@ -40,11 +48,16 @@ def get_filled_history(start_date, end_date):
         })
     start_date_str = start_dt.strftime("%Y%m%d")
     end_date_str = end_dt.strftime("%Y%m%d")
-    with open(f"./trade_history/filled_{start_date_str}_{end_date_str}.json", "w") as f:
-        json.dump(trade_history, f, indent=4)
+    if isAllTime:
+        with open(f"./trade_history/filled_alltime.json", "w") as f:
+            json.dump(trade_history, f, indent=4)
+    else:
+        with open(f"./trade_history/filled_{start_date_str}_{end_date_str}.json", "w") as f:
+            json.dump(trade_history, f, indent=4)
     return response
 if __name__ == "__main__":
     # Example usage
-    start_date = "2025-11-01"
-    end_date = "2025-11-30"
-    get_filled_history(start_date, end_date)
+    start_date = "2023-01-01"
+    end_date = "2023-12-31"
+    # get_filled_history(start_date, end_date)
+    get_filled_history("alltime")
