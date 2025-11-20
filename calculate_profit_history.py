@@ -206,16 +206,36 @@ def calculate_profit(range, ticker, hold):
         "total_profit": round(float(profit_components["total_profit"]), 8),
     }
 
-def calculate_ticker_roi(range, ticker, hold):
-    """Calculate price change vs trading ROI comparison for a single coin"""
+def calculate_ticker_roi(range, ticker, hold, profit_data=None):
+    """Calculate price change vs trading ROI comparison for a single coin
+    
+    Args:
+        range: Time range for data
+        ticker: Trading pair
+        hold: Current holding amount
+        profit_data: Pre-calculated profit data (optional, will load if not provided)
+    """
     trade_history = load_trade_history(range)
     trades_data = extract_ticker_trades(trade_history, ticker)
     
+    # Get current price (needed for price change calculation)
     current_price = get_price(ticker) if hold > 0 else 0
-    profit_components = calculate_profit_components(trades_data, hold, current_price)
     
-    # Calculate net investment: cost basis of current holdings
-    avg_buy_price = profit_components["avg_buy_price"]
+    # Use provided profit data or calculate it
+    if profit_data:
+        total_profit = profit_data["total_profit"]
+        total_buys = profit_data["total_buys"]
+        realized_profit = profit_data["realized_profit"]
+        unrealized_profit = profit_data["unrealized_profit"]
+    else:
+        profit_components = calculate_profit_components(trades_data, hold, current_price)
+        total_profit = profit_components["total_profit"]
+        realized_profit = profit_components["realized_profit"]
+        unrealized_profit = profit_components["unrealized_profit"]
+        total_buys = trades_data["total_buys"]
+    
+    # Calculate average buy price and net investment
+    avg_buy_price = trades_data["total_buys"] / trades_data["total_buy_size"] if trades_data["total_buy_size"] > 0 else 0
     if hold > 0 and trades_data["total_buy_size"] > 0:
         net_investment = avg_buy_price * hold
     else:
@@ -225,10 +245,10 @@ def calculate_ticker_roi(range, ticker, hold):
     hold_ratio = (hold / trades_data["total_buy_size"]) if trades_data["total_buy_size"] > 0 else 0
     
     if hold_ratio < 0.05:  # Close to fully sold out
-        trading_roi_percent = (profit_components["total_profit"] / trades_data["total_buys"] * 100) if trades_data["total_buys"] > 0 else 0
-        net_investment = trades_data["total_buys"]
+        trading_roi_percent = (total_profit / total_buys * 100) if total_buys > 0 else 0
+        net_investment = total_buys
     elif hold > 0 and net_investment > 0:
-        trading_roi_percent = (profit_components["total_profit"] / net_investment * 100)
+        trading_roi_percent = (total_profit / net_investment * 100)
     else:
         trading_roi_percent = 0
     
@@ -263,27 +283,42 @@ def calculate_ticker_roi(range, ticker, hold):
         "start_price": round(float(start_price), 8),
         "current_price": round(float(current_price), 8),
         "price_change_percent": round(float(price_change_percent), 2),
-        "total_buys": round(float(trades_data["total_buys"]), 8),
+        "total_buys": round(float(total_buys if profit_data else trades_data["total_buys"]), 8),
         "total_sells": round(float(trades_data["total_sells"]), 8),
         "net_investment": round(float(net_investment), 8),
         "hold_amount": round(float(hold), 8),
-        "realized_profit": round(float(profit_components["realized_profit"]), 8),
-        "unrealized_profit": round(float(profit_components["unrealized_profit"]), 8),
-        "total_profit": round(float(profit_components["total_profit"]), 8),
+        "realized_profit": round(float(realized_profit), 8),
+        "unrealized_profit": round(float(unrealized_profit), 8),
+        "total_profit": round(float(total_profit), 8),
         "trading_roi_percent": round(float(trading_roi_percent), 2),
         "performance_diff": round(float(performance_diff), 2),
         "beat_hodl": performance_diff >= 0
     }
 
-def calculate_ticker_vs_btc(range, ticker, hold, start_time=None):
-    """Calculate actual profit of a single coin vs if invested in BTC"""
+def calculate_ticker_vs_btc(range, ticker, hold, start_time=None, profit_data=None):
+    """Calculate actual profit of a single coin vs if invested in BTC
+    
+    Args:
+        range: Time range for data
+        ticker: Trading pair
+        hold: Current holding amount
+        start_time: Optional unified start time
+        profit_data: Pre-calculated profit data (optional, will load if not provided)
+    """
     trade_history = load_trade_history(range)
     trades_data = extract_ticker_trades(trade_history, ticker)
     
-    current_price = get_price(ticker) if hold > 0 else 0
-    profit_components = calculate_profit_components(trades_data, hold, current_price)
-    
-    actual_profit = profit_components["total_profit"]
+    # Use provided profit data or calculate it
+    if profit_data:
+        actual_profit = profit_data["total_profit"]
+        total_buys = profit_data["total_buys"]
+        total_sells = profit_data["total_sells"]
+    else:
+        current_price = get_price(ticker) if hold > 0 else 0
+        profit_components = calculate_profit_components(trades_data, hold, current_price)
+        actual_profit = profit_components["total_profit"]
+        total_buys = trades_data["total_buys"]
+        total_sells = trades_data["total_sells"]
     
     # Calculate profit if invested in BTC
     if trades_data["buy_times"] and trades_data["total_buys"] > 0:
@@ -315,8 +350,8 @@ def calculate_ticker_vs_btc(range, ticker, hold, start_time=None):
     return {
         "ticker": ticker,
         "start_time": start_time,
-        "total_buys": round(float(trades_data["total_buys"]), 8),
-        "total_sells": round(float(trades_data["total_sells"]), 8),
+        "total_buys": round(float(total_buys if profit_data else trades_data["total_buys"]), 8),
+        "total_sells": round(float(total_sells if profit_data else trades_data["total_sells"]), 8),
         "hold_amount": round(float(hold), 8),
         "actual_profit": round(float(actual_profit), 8),
         "btc_alternative_profit": round(float(btc_alternative_profit), 8),
@@ -445,8 +480,13 @@ def print_btc_baseline_comparison():
     print(f"Difference: ${difference:,.2f} ({'+' if difference > 0 else ''}{(difference / baseline['btc_profit'] * 100) if baseline['btc_profit'] != 0 else 0:.2f}%)")
     print("=" * 70)
 
-def print_ticker_vs_btc_comparison(start_time=None):
-    """Print comparison of each ticker vs BTC"""
+def print_ticker_vs_btc_comparison(start_time=None, range="alltime"):
+    """Print comparison of each ticker vs BTC
+    
+    Args:
+        start_time: Optional unified start time
+        range: Time range for data (default: "alltime")
+    """
     print("\n" + "=" * 90)
     if start_time:
         print(f"TICKER vs BTC COMPARISON (Unified Start Time: {start_time})")
@@ -454,7 +494,18 @@ def print_ticker_vs_btc_comparison(start_time=None):
         print("TICKER vs BTC COMPARISON (Each ticker uses its own first trade time)")
     print("=" * 90)
     
-    range = "alltime"
+    # Load profit data
+    profit_file = f"./profit_history/profit_{range}.json"
+    if not os.path.exists(profit_file):
+        print(f"Error: {profit_file} not found. Please run all_time_profit() first.")
+        return
+    
+    with open(profit_file, "r") as f:
+        profit_data_list = json.load(f)
+    
+    # Create a dict for quick lookup
+    profit_dict = {item["ticker"]: item for item in profit_data_list}
+    
     hold = get_hold()
     all_tickers = get_all_tickers(range, hold)
     
@@ -466,7 +517,8 @@ def print_ticker_vs_btc_comparison(start_time=None):
         if coin == "USDC":
             continue
         ticker = f"{coin}-USDC"
-        result = calculate_ticker_vs_btc(range, ticker, hold.get(coin, {}).get("hold", 0), start_time)
+        profit_data = profit_dict.get(ticker)
+        result = calculate_ticker_vs_btc(range, ticker, hold.get(coin, {}).get("hold", 0), start_time, profit_data=profit_data)
         comparisons.append(result)
         
         symbol = "✅" if result["better_than_btc"] else "❌"
@@ -480,16 +532,30 @@ def print_ticker_vs_btc_comparison(start_time=None):
     print(f"\nCoins Outperforming BTC: {better_count}/{total_count} ({better_count/total_count*100 if total_count > 0 else 0:.1f}%)")
     print("=" * 100)
     
-    with open(f"./profit_history/ticker_vs_btc_comparison.json", "w") as f:
-        json.dump(comparisons, f, indent=4)
+    return comparisons
 
-def print_ticker_roi_comparison():
-    """Print comparison of each ticker's price change vs trading performance"""
+def print_ticker_roi_comparison(range="alltime"):
+    """Print comparison of each ticker's price change vs trading performance
+    
+    Args:
+        range: Time range for data (default: "alltime")
+    """
     print("\n" + "=" * 130)
     print("TICKER PRICE vs TRADING PERFORMANCE (Price Change vs My Trading Performance)")
     print("=" * 130)
     
-    range = "alltime"
+    # Load profit data
+    profit_file = f"./profit_history/profit_{range}.json"
+    if not os.path.exists(profit_file):
+        print(f"Error: {profit_file} not found. Please run all_time_profit() first.")
+        return
+    
+    with open(profit_file, "r") as f:
+        profit_data_list = json.load(f)
+    
+    # Create a dict for quick lookup
+    profit_dict = {item["ticker"]: item for item in profit_data_list}
+    
     hold = get_hold()
     all_tickers = get_all_tickers(range, hold)
     
@@ -501,7 +567,8 @@ def print_ticker_roi_comparison():
         if coin == "USDC":
             continue
         ticker = f"{coin}-USDC"
-        result = calculate_ticker_roi(range, ticker, hold.get(coin, {}).get("hold", 0))
+        profit_data = profit_dict.get(ticker)
+        result = calculate_ticker_roi(range, ticker, hold.get(coin, {}).get("hold", 0), profit_data=profit_data)
         roi_results.append(result)
         
         start_time_display = result.get('start_time', 'N/A')[:19] if result.get('start_time') else 'N/A'
@@ -546,8 +613,42 @@ def print_ticker_roi_comparison():
     print(f"  Overall ROI: {overall_roi:.2f}%")
     print("=" * 130)
     
-    with open(f"./profit_history/ticker_roi_comparison.json", "w") as f:
-        json.dump(roi_results, f, indent=4)
+    return roi_results
+
+def save_comparison_data(range="alltime", start_time=None):
+    """Generate and save combined comparison data (ROI + vs BTC)
+    
+    Args:
+        range: Time range for data (default: "alltime")
+        start_time: Optional unified start time for BTC comparison
+    """
+    # Generate ROI comparison
+    roi_results = print_ticker_roi_comparison(range=range)
+    
+    # Generate vs BTC comparison
+    btc_results = print_ticker_vs_btc_comparison(start_time=start_time, range=range)
+    
+    if roi_results is None or btc_results is None:
+        print("\nError: Failed to generate comparison data")
+        return
+    
+    # Combine results
+    combined = {
+        "range": range,
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "roi_comparison": roi_results,
+        "vs_btc_comparison": btc_results
+    }
+    
+    # Create comparison directory if it doesn't exist
+    os.makedirs("./comparison", exist_ok=True)
+    
+    # Save to file
+    output_file = f"./comparison/comparison_{range}.json"
+    with open(output_file, "w") as f:
+        json.dump(combined, f, indent=4)
+    
+    print(f"\n✅ Comparison data saved to {output_file}")
 
 # ==================== Main Program ====================
 
@@ -555,14 +656,13 @@ if __name__ == "__main__":
     # Display basic profit information
     all_time_profit()
     
-    # Display investment return rate for each coin
-    print_ticker_roi_comparison()
-    
-    # Method 1: Use first trade time as baseline (default)
+    # Display BTC baseline comparison
     print_btc_baseline_comparison()
-    print_ticker_vs_btc_comparison()
+    
+    # Generate and save combined comparison data
+    save_comparison_data(range="alltime")
     
     # Method 2: Use specified unified start time
     # unified_start_time = "2025-10-22T00:34:38.959435Z"
     # print_btc_baseline_comparison(start_time=unified_start_time)
-    # print_ticker_vs_btc_comparison(start_time=unified_start_time)
+    # save_comparison_data(range="alltime", start_time=unified_start_time)
