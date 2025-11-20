@@ -54,7 +54,7 @@ pip install -r requirements.txt
 Create a `.env` file in the root directory with your Coinbase API credentials:
 ```env
 COINBASE_API_KEY=your_api_key_here
-COINBASE_API_SECRET=your_api_secret_here
+COINBASE_API_SECRET_KEY=your_api_secret_key_here
 ```
 
 **To get your API credentials:**
@@ -394,7 +394,7 @@ ROI = (Total Profit / Net Investment) × 100%
 
 ### "No API credentials found"
 - Make sure `.env` file exists in project root
-- Check that `COINBASE_API_KEY` and `COINBASE_API_SECRET` are set
+- Check that `COINBASE_API_KEY` and `COINBASE_API_SECRET_KEY` are set
 
 ### "Failed to fetch historical price"
 - Coinbase API rate limits may apply
