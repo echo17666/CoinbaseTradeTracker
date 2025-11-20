@@ -62,7 +62,7 @@ Your `.env` file shows the key with `\n` escape sequences. You need to convert t
 ```bash
 # Method 1: Use echo -e to interpret \n
 cd /Users/echo/Desktop/CoinbaseTradeTracker/CoinbaseTradeTracker
-grep COINBASE_API_SECRET_KEY .env | cut -d'=' -f2- | tr -d '"' | xargs echo -e
+grep COINBASE_API__KEY .env | cut -d'=' -f2- | tr -d '"' | xargs echo -e
 ```
 
 This will output the key with REAL newlines. Copy this output.
@@ -218,8 +218,6 @@ git push
 **The secret should look like:**
 ```
 -----BEGIN EC PRIVATE KEY-----
-***REMOVED***
-***REMOVED***
 Multiple lines
 -----END EC PRIVATE KEY-----
 ```
