@@ -48,9 +48,35 @@ logs/
 - Name: `COINBASE_API_KEY`
 - Value: Your Coinbase API key (from `.env` file)
 
-**Secret 2:**
-- Name: `COINBASE_API_SECRET`
-- Value: Your Coinbase API secret (from `.env` file)
+**Secret 2: ⚠️ IMPORTANT - Preserving PEM Format**
+- Name: `COINBASE_API_SECRET_KEY` (note: ends with `_KEY`)
+- Value: Your Coinbase API secret from `.env` file
+- **CRITICAL**: The private key MUST have actual newlines, not `\n` characters
+  
+**How to add the secret correctly:**
+
+**Step 1: Extract the actual key with proper newlines**
+
+Your `.env` file shows the key with `\n` escape sequences. You need to convert these to real newlines:
+
+```bash
+# Method 1: Use echo -e to interpret \n
+cd /Users/echo/Desktop/CoinbaseTradeTracker/CoinbaseTradeTracker
+grep COINBASE_API_SECRET_KEY .env | cut -d'=' -f2- | tr -d '"' | xargs echo -e
+```
+
+This will output the key with REAL newlines. Copy this output.
+
+**Step 2: Paste into GitHub**
+
+The output should look like:
+```
+-----BEGIN EC PRIVATE KEY-----
+Multiple lines
+-----END EC PRIVATE KEY-----
+```
+
+Paste THIS into the GitHub Secret value field (with the newlines, not the `\n` characters).
 
 ### Step 2: Enable GitHub Actions
 
@@ -165,9 +191,47 @@ git push
 
 ## 🆘 Troubleshooting
 
+### "Could not deserialize key data" / "unsupported key type"
+**This is the most common error!** It means the private key format is incorrect.
+
+**Root Cause:** Your `.env` file has `\n` as literal characters, but the Python code needs ACTUAL newlines.
+
+**Solution:**
+
+1. **Extract the key with real newlines:**
+   ```bash
+   cd /Users/echo/Desktop/CoinbaseTradeTracker/CoinbaseTradeTracker
+   grep COINBASE_API_SECRET_KEY .env | cut -d'=' -f2- | tr -d '"' | xargs echo -e
+   ```
+
+2. **Copy the output** (it will have multiple lines)
+
+3. **Go to GitHub:**
+   - Settings → Secrets and variables → Actions
+   - Delete existing `COINBASE_API_SECRET_KEY` if it exists
+   - Create new secret:
+     - Name: `COINBASE_API_SECRET_KEY`
+     - Value: Paste the output from step 2
+
+4. **Verify the secret has multiple lines in the text box**
+
+**The secret should look like:**
+```
+-----BEGIN EC PRIVATE KEY-----
+***REMOVED***
+***REMOVED***
+Multiple lines
+-----END EC PRIVATE KEY-----
+```
+
+**❌ NOT like this (with `\n` visible):**
+```
+-----BEGIN EC PRIVATE KEY-----\nMHcCAQEE...\n-----END EC PRIVATE KEY-----\n
+```
+
 ### "Error: API credentials not found"
 - Check that secrets are set correctly in GitHub Settings
-- Secret names must match exactly: `COINBASE_API_KEY` and `COINBASE_API_SECRET`
+- Secret names must match exactly: `COINBASE_API_KEY` and `COINBASE_API_SECRET_KEY` (note the `_KEY` suffix)
 
 ### "Permission denied" when pushing
 - Verify workflow permissions are set to "Read and write"

@@ -3,7 +3,8 @@ name: Daily Trade Update
 on:
   schedule:
     # Run at 00:00 UTC every day (convert to your timezone)
-    - cron: '0 0 * * *'
+    # - cron: '0 0 * * *'
+    - cron: '@once' # Since it is a demo, we use '@once' to trigger manually
   workflow_dispatch:  # Allow manual trigger
 
 jobs:
@@ -26,10 +27,31 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     
-    - name: Create .env file with secrets
+    - name: Set environment variables from secrets
       run: |
-        echo "COINBASE_API_KEY=${{ secrets.COINBASE_API_KEY }}" >> .env
-        echo "COINBASE_API_SECRET=${{ secrets.COINBASE_API_SECRET }}" >> .env
+        echo "COINBASE_API_KEY=${{ secrets.COINBASE_API_KEY }}" >> $GITHUB_ENV
+        # Store multi-line secret in environment variable
+        echo "COINBASE_API_SECRET_KEY<<EOF" >> $GITHUB_ENV
+        echo "${{ secrets.COINBASE_API_SECRET_KEY }}" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
+    
+    - name: Create .env file
+      run: |
+        {
+          echo "COINBASE_API_KEY=$COINBASE_API_KEY"
+          echo "COINBASE_API_SECRET_KEY=$COINBASE_API_SECRET_KEY"
+        } > .env
+    
+    - name: Debug - Verify .env file
+      run: |
+        echo "=== Checking .env file format ==="
+        wc -l .env
+        echo "=== First line ==="
+        head -n 1 .env
+        echo "=== Secret starts with (first 50 chars) ==="
+        grep COINBASE_API_SECRET_KEY .env | cut -c1-50
+        echo "=== Testing Python import ==="
+        python -c "from dotenv import load_dotenv; import os; load_dotenv(); print('API_KEY:', os.getenv('COINBASE_API_KEY')[:20] + '...'); print('SECRET exists:', bool(os.getenv('COINBASE_API_SECRET_KEY'))); print('SECRET starts with:', os.getenv('COINBASE_API_SECRET_KEY')[:30] if os.getenv('COINBASE_API_SECRET_KEY') else 'NONE')"
     
     - name: Run daily update
       run: |
