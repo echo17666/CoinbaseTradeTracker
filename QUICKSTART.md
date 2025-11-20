@@ -17,7 +17,7 @@ pip install -r requirements.txt
 
 # Add your API credentials to .env file
 echo "COINBASE_API_KEY=your_key_here" > .env
-echo "COINBASE_API_SECRET=your_secret_here" >> .env
+echo "COINBASE_API_SECRET_KEY=your_secret_key_here" >> .env
 ```
 
 ### 2. Initial Data Collection
