@@ -63,6 +63,10 @@ COINBASE_API_SECRET=your_api_secret_here
 3. Copy the API Key and API Secret to your `.env` file
 
 ### 5. Initial Data Fetch
+
+First delete existing data (if any) in the `trade_history/`, `profit_history/`, `comparison/`, and `charts/` directories to start fresh.
+
+Then run:
 ```bash
 # Fetch all trade history
 python get_filled_history.py
