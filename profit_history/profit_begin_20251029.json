@@ -1,0 +1,22 @@
+[
+    {
+        "ticker": "ETH-USDC",
+        "total_buys": 1149.97880831,
+        "total_sells": 428.31008545,
+        "hold_amount": 0.19513137,
+        "price_at_date": 3904.17,
+        "realized_profit": 5.66909946,
+        "unrealized_profit": -13.0232123,
+        "total_profit": -7.35411285
+    },
+    {
+        "ticker": "SOL-USDC",
+        "total_buys": 549.99816484,
+        "total_sells": 101.86311325,
+        "hold_amount": 1.68323533,
+        "price_at_date": 193.92,
+        "realized_profit": 2.74811116,
+        "unrealized_profit": -8.16582952,
+        "total_profit": -5.41771836
+    }
+]

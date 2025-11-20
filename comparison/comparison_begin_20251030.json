@@ -1,0 +1,93 @@
+{
+    "range": "begin_20251030",
+    "end_date": "2025-10-30",
+    "generated_at": "2025-11-20T09:44:33.445135+00:00",
+    "roi_comparison": [
+        {
+            "ticker": "ETH-USDC",
+            "start_time": "2025-10-22T00:34:38.959435Z",
+            "start_price": 3841.0,
+            "current_price": 3804.24,
+            "price_change_percent": -0.96,
+            "total_buys": 1149.97880831,
+            "total_sells": 428.68637297,
+            "net_investment": 774.84925312,
+            "hold_amount": 0.19513137,
+            "realized_profit": 5.6482959,
+            "unrealized_profit": -32.52269011,
+            "total_profit": -26.87439421,
+            "trading_roi_percent": -3.47,
+            "performance_diff": -2.51,
+            "beat_hodl": false
+        },
+        {
+            "ticker": "BTC-USDC",
+            "start_time": "2025-10-30T14:24:34.325860Z",
+            "start_price": 107861.92,
+            "current_price": 108308.02,
+            "price_change_percent": 0.41,
+            "total_buys": 0.10868233,
+            "total_sells": 0.10754228,
+            "net_investment": 239.29675331,
+            "hold_amount": 0.0022018,
+            "realized_profit": -0.00114005,
+            "unrealized_profit": -0.82415488,
+            "total_profit": -0.82529493,
+            "trading_roi_percent": -0.34,
+            "performance_diff": -0.76,
+            "beat_hodl": false
+        },
+        {
+            "ticker": "SOL-USDC",
+            "start_time": "2025-10-26T18:26:33.575740Z",
+            "start_price": 199.19,
+            "current_price": 184.69,
+            "price_change_percent": -7.28,
+            "total_buys": 549.99816484,
+            "total_sells": 101.86311325,
+            "net_investment": 334.57882471,
+            "hold_amount": 1.68323533,
+            "realized_profit": 2.74811116,
+            "unrealized_profit": -23.70209161,
+            "total_profit": -20.95398045,
+            "trading_roi_percent": -6.26,
+            "performance_diff": 1.02,
+            "beat_hodl": true
+        }
+    ],
+    "vs_btc_comparison": [
+        {
+            "ticker": "ETH-USDC",
+            "start_time": "2025-10-22T00:34:38.959435Z",
+            "total_buys": 1149.97880831,
+            "total_sells": 428.68637297,
+            "hold_amount": 0.19513137,
+            "actual_profit": -26.87439421,
+            "btc_alternative_profit": 2.29799964,
+            "difference": -29.17239385,
+            "better_than_btc": false
+        },
+        {
+            "ticker": "BTC-USDC",
+            "start_time": "2025-10-30T14:24:34.325860Z",
+            "total_buys": 0.10868233,
+            "total_sells": 0.10754228,
+            "hold_amount": 0.0022018,
+            "actual_profit": -0.82529493,
+            "btc_alternative_profit": 0.00044949,
+            "difference": -0.82574442,
+            "better_than_btc": false
+        },
+        {
+            "ticker": "SOL-USDC",
+            "start_time": "2025-10-26T18:26:33.575740Z",
+            "total_buys": 549.99816484,
+            "total_sells": 101.86311325,
+            "hold_amount": 1.68323533,
+            "actual_profit": -20.95398045,
+            "btc_alternative_profit": -25.39196606,
+            "difference": 4.43798561,
+            "better_than_btc": true
+        }
+    ]
+}

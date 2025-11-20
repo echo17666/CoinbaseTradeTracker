@@ -1,0 +1,37 @@
+{
+    "range": "begin_20251024",
+    "end_date": "2025-10-24",
+    "generated_at": "2025-11-20T09:44:00.148769+00:00",
+    "roi_comparison": [
+        {
+            "ticker": "ETH-USDC",
+            "start_time": "2025-10-22T00:34:38.959435Z",
+            "start_price": 3841.0,
+            "current_price": 3936.1,
+            "price_change_percent": 2.48,
+            "total_buys": 499.98192535,
+            "total_sells": 101.36992013,
+            "net_investment": 746.67006423,
+            "hold_amount": 0.19513137,
+            "realized_profit": 2.57667065,
+            "unrealized_profit": 21.38652122,
+            "total_profit": 23.96319187,
+            "trading_roi_percent": 3.21,
+            "performance_diff": 0.73,
+            "beat_hodl": true
+        }
+    ],
+    "vs_btc_comparison": [
+        {
+            "ticker": "ETH-USDC",
+            "start_time": "2025-10-22T00:34:38.959435Z",
+            "total_buys": 499.98192535,
+            "total_sells": 101.36992013,
+            "hold_amount": 0.19513137,
+            "actual_profit": 23.96319187,
+            "btc_alternative_profit": 13.64579622,
+            "difference": 10.31739565,
+            "better_than_btc": true
+        }
+    ]
+}

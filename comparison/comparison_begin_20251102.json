@@ -1,0 +1,121 @@
+{
+    "range": "begin_20251102",
+    "end_date": "2025-11-02",
+    "generated_at": "2025-11-20T09:45:02.990120+00:00",
+    "roi_comparison": [
+        {
+            "ticker": "ETH-USDC",
+            "start_time": "2025-10-22T00:34:38.959435Z",
+            "start_price": 3841.0,
+            "current_price": 3906.01,
+            "price_change_percent": 1.69,
+            "total_buys": 1149.97880831,
+            "total_sells": 543.18422297,
+            "net_investment": 774.84925312,
+            "hold_amount": 0.19513137,
+            "realized_profit": 1.01882366,
+            "unrealized_profit": -12.66417058,
+            "total_profit": -11.64534693,
+            "trading_roi_percent": -1.5,
+            "performance_diff": -3.2,
+            "beat_hodl": false
+        },
+        {
+            "ticker": "SOL-USDC",
+            "start_time": "2025-10-26T18:26:33.575740Z",
+            "start_price": 199.19,
+            "current_price": 187.67,
+            "price_change_percent": -5.78,
+            "total_buys": 549.99816484,
+            "total_sells": 101.86311325,
+            "net_investment": 334.57882471,
+            "hold_amount": 1.68323533,
+            "realized_profit": 2.74811116,
+            "unrealized_profit": -18.68605033,
+            "total_profit": -15.93793917,
+            "trading_roi_percent": -4.76,
+            "performance_diff": 1.02,
+            "beat_hodl": true
+        },
+        {
+            "ticker": "BTC-USDC",
+            "start_time": "2025-10-30T14:24:34.325860Z",
+            "start_price": 107861.92,
+            "current_price": 110533.83,
+            "price_change_percent": 2.48,
+            "total_buys": 0.10868233,
+            "total_sells": 0.10754228,
+            "net_investment": 239.29675331,
+            "hold_amount": 0.0022018,
+            "realized_profit": -0.00114005,
+            "unrealized_profit": 4.07663358,
+            "total_profit": 4.07549353,
+            "trading_roi_percent": 1.7,
+            "performance_diff": -0.77,
+            "beat_hodl": false
+        },
+        {
+            "ticker": "ZEC-USDC",
+            "start_time": "2025-10-31T17:29:06.495457Z",
+            "start_price": 373.88,
+            "current_price": 418.39,
+            "price_change_percent": 11.9,
+            "total_buys": 308.48770839,
+            "total_sells": 161.70234492,
+            "net_investment": 202.20641661,
+            "hold_amount": 0.51426671,
+            "realized_profit": 10.97106282,
+            "unrealized_profit": 12.95763219,
+            "total_profit": 23.928695,
+            "trading_roi_percent": 11.83,
+            "performance_diff": -0.07,
+            "beat_hodl": false
+        }
+    ],
+    "vs_btc_comparison": [
+        {
+            "ticker": "ETH-USDC",
+            "start_time": "2025-10-22T00:34:38.959435Z",
+            "total_buys": 1149.97880831,
+            "total_sells": 543.18422297,
+            "hold_amount": 0.19513137,
+            "actual_profit": -11.64534693,
+            "btc_alternative_profit": 25.97814116,
+            "difference": -37.62348809,
+            "better_than_btc": false
+        },
+        {
+            "ticker": "SOL-USDC",
+            "start_time": "2025-10-26T18:26:33.575740Z",
+            "total_buys": 549.99816484,
+            "total_sells": 101.86311325,
+            "hold_amount": 1.68323533,
+            "actual_profit": -15.93793917,
+            "btc_alternative_profit": -14.61092027,
+            "difference": -1.3270189,
+            "better_than_btc": false
+        },
+        {
+            "ticker": "BTC-USDC",
+            "start_time": "2025-10-30T14:24:34.325860Z",
+            "total_buys": 0.10868233,
+            "total_sells": 0.10754228,
+            "hold_amount": 0.0022018,
+            "actual_profit": 4.07549353,
+            "btc_alternative_profit": 0.00269223,
+            "difference": 4.0728013,
+            "better_than_btc": true
+        },
+        {
+            "ticker": "ZEC-USDC",
+            "start_time": "2025-10-31T17:29:06.495457Z",
+            "total_buys": 308.48770839,
+            "total_sells": 161.70234492,
+            "hold_amount": 0.51426671,
+            "actual_profit": 23.928695,
+            "btc_alternative_profit": 4.41307009,
+            "difference": 19.51562491,
+            "better_than_btc": true
+        }
+    ]
+}

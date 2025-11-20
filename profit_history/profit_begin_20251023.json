@@ -1,0 +1,12 @@
+[
+    {
+        "ticker": "ETH-USDC",
+        "total_buys": 499.98192535,
+        "total_sells": 0.0,
+        "hold_amount": 0.19513137,
+        "price_at_date": 3858.41,
+        "realized_profit": 0.0,
+        "unrealized_profit": 6.22676509,
+        "total_profit": 6.22676509
+    }
+]

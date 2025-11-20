@@ -222,6 +222,14 @@ def calculate_ticker_roi(range, ticker, hold, profit_data=None):
     # Get current price (needed for price change calculation)
     current_price = get_historical_price_from_candles(ticker, (datetime.now(timezone.utc) - timedelta(minutes=5)).replace(microsecond=0).isoformat().replace("+00:00", "Z")) if hold > 0 else 0
     
+    # Fallback to trade price if current price couldn't be fetched
+    if current_price is None or current_price == 0:
+        ticker_trades = sorted([t for t in trade_history if t["product_id"] == ticker], key=lambda x: x["trade_time"])
+        if ticker_trades:
+            current_price = float(ticker_trades[-1]["price"])  # Use last trade price
+        else:
+            current_price = 0
+    
     # Use provided profit data or calculate it
     if profit_data:
         total_profit = profit_data["total_profit"]
@@ -266,6 +274,10 @@ def calculate_ticker_roi(range, ticker, hold, profit_data=None):
             else:
                 start_price = current_price
     else:
+        start_price = current_price
+    
+    # Ensure start_price is not None
+    if start_price is None:
         start_price = current_price
     
     # Calculate price change percentage
@@ -438,6 +450,9 @@ def all_time_profit():
     
     print("-" * 60)
     print(f"{'TOTAL':<10} ${total_realized:>13.2f} ${total_unrealized:>13.2f} ${total_profit:>13.2f}")
+    
+    # Create directory if it doesn't exist
+    os.makedirs("./profit_history", exist_ok=True)
     
     with open(f"./profit_history/profit_{range}.json", "w") as f:
         json.dump(results, f, indent=4)

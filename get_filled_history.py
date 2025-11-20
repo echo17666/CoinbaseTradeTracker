@@ -1,12 +1,19 @@
 import requests
 import json
-
+import os
 
 from datetime import datetime, timezone
 from utils import build_jwt
 
 
-def get_filled_history(start_date, end_date=None):
+def get_filled_history(start_date, end_date=None, incremental=False):
+    """Get filled trade history from Coinbase API
+    
+    Args:
+        start_date: Start date string or "alltime"
+        end_date: End date string
+        incremental: If True, merge with existing data instead of overwriting
+    """
     # alltime condition
     isAllTime=False
     if start_date=="alltime":
@@ -35,9 +42,10 @@ def get_filled_history(start_date, end_date=None):
         querystring = {"limit":"2000"}
     response = requests.get(url, headers=headers,params=querystring)
     response=response.json()
-    trade_history=[]
+    
+    new_trades=[]
     for item in response.get("fills", []):
-        trade_history.append({
+        new_trades.append({
             "trade_time": item.get("trade_time"), # ISO 8601 format
             "trade_type": item.get("trade_type"), # "FILL"
             "price": item.get("price"),           # Price per unit
@@ -46,15 +54,58 @@ def get_filled_history(start_date, end_date=None):
             "commission": item.get("commission"), # Commission fee
             "side": item.get("side"),             # "BUY" or "SELL"
         })
+    
+    # Create directory if it doesn't exist
+    os.makedirs("./trade_history", exist_ok=True)
+    
     start_date_str = start_dt.strftime("%Y%m%d")
     end_date_str = end_dt.strftime("%Y%m%d")
+    
     if isAllTime:
-        with open(f"./trade_history/filled_alltime.json", "w") as f:
+        file_path = f"./trade_history/filled_alltime.json"
+        
+        # If incremental mode and file exists, merge with existing data
+        if incremental and os.path.exists(file_path):
+            try:
+                with open(file_path, "r") as f:
+                    existing_trades = json.load(f)
+                
+                # Create a set of existing trade identifiers (time + product_id + side + price)
+                existing_ids = {
+                    (t["trade_time"], t["product_id"], t["side"], t["price"])
+                    for t in existing_trades
+                }
+                
+                # Add only new trades that don't exist
+                trades_added = 0
+                for trade in new_trades:
+                    trade_id = (trade["trade_time"], trade["product_id"], trade["side"], trade["price"])
+                    if trade_id not in existing_ids:
+                        existing_trades.append(trade)
+                        trades_added += 1
+                
+                # Sort by trade_time to maintain chronological order
+                existing_trades.sort(key=lambda x: x["trade_time"])
+                trade_history = existing_trades
+                
+                print(f"📊 Incremental update: {trades_added} new trades added, {len(existing_trades)} total trades")
+                
+            except Exception as e:
+                print(f"⚠️  Could not load existing data, using new data only: {e}")
+                trade_history = new_trades
+        else:
+            trade_history = new_trades
+            if incremental:
+                print(f"📊 First time fetch: {len(trade_history)} trades")
+        
+        with open(file_path, "w") as f:
             json.dump(trade_history, f, indent=4)
     else:
         with open(f"./trade_history/filled_{start_date_str}_{end_date_str}.json", "w") as f:
-            json.dump(trade_history, f, indent=4)
+            json.dump(new_trades, f, indent=4)
+            
     return response
+
 if __name__ == "__main__":
     # Example usage
     start_date = "2023-01-01"

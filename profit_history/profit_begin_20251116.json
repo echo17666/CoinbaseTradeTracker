@@ -1,0 +1,62 @@
+[
+    {
+        "ticker": "DASH-USDC",
+        "total_buys": 223.0629975,
+        "total_sells": 197.795325,
+        "hold_amount": 0.0,
+        "price_at_date": 0.0,
+        "realized_profit": -25.2676725,
+        "unrealized_profit": 0.0,
+        "total_profit": -25.2676725
+    },
+    {
+        "ticker": "SOL-USDC",
+        "total_buys": 1202.55732076,
+        "total_sells": 885.97521188,
+        "hold_amount": 1.68323533,
+        "price_at_date": 137.07,
+        "realized_profit": -15.81565931,
+        "unrealized_profit": -63.28513753,
+        "total_profit": -79.10079684
+    },
+    {
+        "ticker": "BTC-USDC",
+        "total_buys": 440.20618233,
+        "total_sells": 328.27396982,
+        "hold_amount": 0.0022018,
+        "price_at_date": 94182.03,
+        "realized_profit": -14.13035018,
+        "unrealized_profit": -7.97014682,
+        "total_profit": -22.100497
+    },
+    {
+        "ticker": "ZEC-USDC",
+        "total_buys": 2708.20408489,
+        "total_sells": 2639.29036301,
+        "hold_amount": 0.51426671,
+        "price_at_date": 698.99,
+        "realized_profit": 106.73380042,
+        "unrealized_profit": 102.35625204,
+        "total_profit": 209.09005246
+    },
+    {
+        "ticker": "FIL-USDC",
+        "total_buys": 454.78758888,
+        "total_sells": 450.70880583,
+        "hold_amount": 0.001,
+        "price_at_date": 1.958,
+        "realized_profit": -4.07600479,
+        "unrealized_profit": -0.00082026,
+        "total_profit": -4.07682505
+    },
+    {
+        "ticker": "ETH-USDC",
+        "total_buys": 2411.92209396,
+        "total_sells": 1852.00927281,
+        "hold_amount": 0.19513137,
+        "price_at_date": 3092.24,
+        "realized_profit": 6.93258324,
+        "unrealized_profit": -106.5674846,
+        "total_profit": -99.63490136
+    }
+]
