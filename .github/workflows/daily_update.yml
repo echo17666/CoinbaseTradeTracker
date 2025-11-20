@@ -42,17 +42,6 @@ jobs:
           echo "COINBASE_API_SECRET_KEY=$COINBASE_API_SECRET_KEY"
         } > .env
     
-    - name: Debug - Verify .env file
-      run: |
-        echo "=== Checking .env file format ==="
-        wc -l .env
-        echo "=== First line ==="
-        head -n 1 .env
-        echo "=== Secret starts with (first 50 chars) ==="
-        grep COINBASE_API_SECRET_KEY .env | cut -c1-50
-        echo "=== Testing Python import ==="
-        python -c "from dotenv import load_dotenv; import os; load_dotenv(); print('API_KEY:', os.getenv('COINBASE_API_KEY')[:20] + '...'); print('SECRET exists:', bool(os.getenv('COINBASE_API_SECRET_KEY'))); print('SECRET starts with:', os.getenv('COINBASE_API_SECRET_KEY')[:30] if os.getenv('COINBASE_API_SECRET_KEY') else 'NONE')"
-    
     - name: Run daily update
       run: |
         python daily_update.py
