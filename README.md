@@ -316,9 +316,13 @@ All charts combine **stacked bar charts** (showing realized/unrealized breakdown
 
 **Generated Charts:**
 1. `total_daily_profit.png`: Portfolio-wide cumulative profit over time
+![](./charts/total_daily_profit.png)
 2. `daily_profit_all_coins.png`: Per-coin profit breakdown
+![](./charts/daily_profit_all_coins.png)
 3. `vs_btc_all_coins.png`: Your profit vs BTC alternative for each coin
+![](./charts/vs_btc_all_coins.png)
 4. `roi_comparison_all_coins.png`: Trading ROI vs price change (HODL ROI)
+![](./charts/roi_comparison_all_coins.png)
 
 ## How It Works
 
