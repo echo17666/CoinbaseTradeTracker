@@ -2,7 +2,11 @@
 __pycache__/
 *.py[codz]
 *$py.class
-
+trade_history/
+profit_history/
+comparison/
+# charts/
+logs/
 # C extensions
 *.so
 
