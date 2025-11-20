@@ -330,7 +330,7 @@ def plot_vs_btc_comparison(comparison_data, coin=None):
     if num_coins == 1:
         axes = [axes]
     
-    fig.suptitle("Actual Profit vs BTC Alternative" if not coin else f"Profit vs BTC for {coin}", fontsize=16)
+    fig.suptitle("Actual Profit vs BTC Alternative" if not coin else f"Profit vs BTC for {coin}", fontsize=16, y=0.995)
     
     for idx, ticker in enumerate(coins_to_plot):
         ax = axes[idx]
@@ -421,7 +421,7 @@ def plot_roi_comparison(comparison_data, coin=None):
     if num_coins == 1:
         axes = [axes]
     
-    fig.suptitle("Price Change vs Trading ROI" if not coin else f"ROI Comparison for {coin}", fontsize=16)
+    fig.suptitle("Price Change vs Trading ROI" if not coin else f"ROI Comparison for {coin}", fontsize=16, y=0.995)
     
     for idx, ticker in enumerate(coins_to_plot):
         ax = axes[idx]
