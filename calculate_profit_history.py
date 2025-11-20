@@ -1,7 +1,7 @@
 import json
 import os
 import requests
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from utils import build_jwt
 
 # ==================== API Call Functions ====================
@@ -193,7 +193,8 @@ def calculate_profit(range, ticker, hold):
     trade_history = load_trade_history(range)
     trades_data = extract_ticker_trades(trade_history, ticker)
     
-    current_price = get_price(ticker) if hold > 0 else 0
+    # current_price = get_price(ticker) if hold > 0 else 0
+    current_price = get_historical_price_from_candles(ticker, (datetime.now(timezone.utc) - timedelta(minutes=5)).replace(microsecond=0).isoformat().replace("+00:00", "Z")) if hold > 0 else 0
     profit_components = calculate_profit_components(trades_data, hold, current_price)
     
     return {
@@ -219,7 +220,7 @@ def calculate_ticker_roi(range, ticker, hold, profit_data=None):
     trades_data = extract_ticker_trades(trade_history, ticker)
     
     # Get current price (needed for price change calculation)
-    current_price = get_price(ticker) if hold > 0 else 0
+    current_price = get_historical_price_from_candles(ticker, (datetime.now(timezone.utc) - timedelta(minutes=5)).replace(microsecond=0).isoformat().replace("+00:00", "Z")) if hold > 0 else 0
     
     # Use provided profit data or calculate it
     if profit_data:
@@ -314,7 +315,7 @@ def calculate_ticker_vs_btc(range, ticker, hold, start_time=None, profit_data=No
         total_buys = profit_data["total_buys"]
         total_sells = profit_data["total_sells"]
     else:
-        current_price = get_price(ticker) if hold > 0 else 0
+        current_price = get_historical_price_from_candles(ticker, (datetime.now(timezone.utc) - timedelta(minutes=5)).replace(microsecond=0).isoformat().replace("+00:00", "Z")) if hold > 0 else 0
         profit_components = calculate_profit_components(trades_data, hold, current_price)
         actual_profit = profit_components["total_profit"]
         total_buys = trades_data["total_buys"]
@@ -333,7 +334,7 @@ def calculate_ticker_vs_btc(range, ticker, hold, start_time=None, profit_data=No
             else:
                 btc_price_start = get_price("BTC-USDC")
         
-        btc_price_current = get_price("BTC-USDC")
+        btc_price_current = get_historical_price_from_candles("BTC-USDC", (datetime.now(timezone.utc) - timedelta(minutes=5)).replace(microsecond=0).isoformat().replace("+00:00", "Z"))
         
         net_investment = trades_data["total_buys"] - trades_data["total_sells"]
         btc_amount = trades_data["total_buys"] / btc_price_start
@@ -391,7 +392,7 @@ def calculate_btc_baseline(start_time=None):
         elif trade["side"] == "SELL":
             total_net_investment -= float(trade["price"]) * float(trade["size"]) - float(trade["commission"])
     
-    btc_price_current = get_price("BTC-USDC")
+    btc_price_current = get_historical_price_from_candles("BTC-USDC", (datetime.now(timezone.utc) - timedelta(minutes=5)).replace(microsecond=0).isoformat().replace("+00:00", "Z"))
     btc_amount = total_net_investment / btc_price_start
     btc_current_value = btc_amount * btc_price_current
     btc_profit = btc_current_value - total_net_investment
