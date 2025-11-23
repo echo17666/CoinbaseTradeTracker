@@ -1,6 +1,6 @@
 import json
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from calculate_profit_history import (
     get_hold,
     get_price,
@@ -59,7 +59,15 @@ def calculate_profit_by_date(end_date_str):
         end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
     
     # Set to end of day for price lookup
+    # BUT: if it's today and we're before EOD, use current time minus 5 minutes
+    now = datetime.now(timezone.utc)
     end_datetime = end_date.replace(hour=23, minute=59, second=59, tzinfo=timezone.utc)
+    
+    # If requesting today's data and we haven't reached EOD yet, use recent time
+    if end_date.date() == now.date() and now < end_datetime:
+        end_datetime = (now - timedelta(minutes=5)).replace(microsecond=0)
+        print(f"  ℹ️  Using current time (5 min ago) for today's price: {end_datetime.strftime('%Y-%m-%d %H:%M:%S')}")
+    
     end_date_iso = end_datetime.isoformat().replace('+00:00', 'Z')
     
     # Load all trade history
@@ -100,17 +108,25 @@ def calculate_profit_by_date(end_date_str):
         
         # Get price at the end date (historical price)
         if hold_amount > 0:
-            from calculate_profit_history import get_historical_price_from_candles
+            from calculate_profit_history import get_historical_price_from_candles, get_price
             historical_price = get_historical_price_from_candles(ticker, end_date_iso)
             if not historical_price:
-                # Fallback: use the last trade price before end date
-                ticker_trades = sorted([t for t in filtered_trades if t["product_id"] == ticker], 
-                                     key=lambda x: x["trade_time"], reverse=True)
-                if ticker_trades:
-                    historical_price = float(ticker_trades[0]["price"])
+                # Fallback 1: try to get current real-time price
+                print(f"  ⚠️  Could not get historical price for {coin} at {end_date_str}, trying real-time price...")
+                current_price = get_price(ticker)
+                if current_price and current_price > 0:
+                    historical_price = current_price
+                    print(f"  ℹ️  Using current price ${historical_price:.2f} for {coin}")
                 else:
-                    historical_price = 0
-                    print(f"  ⚠️  Could not get historical price for {coin} at {end_date_str}")
+                    # Fallback 2: use the last trade price before end date
+                    ticker_trades = sorted([t for t in filtered_trades if t["product_id"] == ticker], 
+                                         key=lambda x: x["trade_time"], reverse=True)
+                    if ticker_trades:
+                        historical_price = float(ticker_trades[0]["price"])
+                        print(f"  ℹ️  Using last trade price ${historical_price:.2f} for {coin}")
+                    else:
+                        historical_price = 0
+                        print(f"  ⚠️  Could not determine any price for {coin} at {end_date_str}")
         else:
             historical_price = 0
         
@@ -159,7 +175,14 @@ def calculate_comparison_by_date(end_date_str, profit_results=None):
         end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
     
     # Set to end of day for price lookup
+    # BUT: if it's today and we're before EOD, use current time minus 5 minutes
+    now = datetime.now(timezone.utc)
     end_datetime = end_date.replace(hour=23, minute=59, second=59, tzinfo=timezone.utc)
+    
+    # If requesting today's data and we haven't reached EOD yet, use recent time
+    if end_date.date() == now.date() and now < end_datetime:
+        end_datetime = (now - timedelta(minutes=5)).replace(microsecond=0)
+    
     end_date_iso = end_datetime.isoformat().replace('+00:00', 'Z')
     
     # Load all trade history
@@ -213,16 +236,21 @@ def calculate_comparison_by_date(end_date_str, profit_results=None):
             
             # Get price at the end date (historical price)
             if hold_amount > 0:
-                from calculate_profit_history import get_historical_price_from_candles
+                from calculate_profit_history import get_historical_price_from_candles, get_price
                 current_price = get_historical_price_from_candles(ticker, end_date_iso)
                 if not current_price:
-                    # Fallback: use the last trade price before end date
-                    ticker_trades = sorted([t for t in filtered_trades if t["product_id"] == ticker], 
-                                         key=lambda x: x["trade_time"], reverse=True)
-                    if ticker_trades:
-                        current_price = float(ticker_trades[0]["price"])
+                    # Fallback 1: try to get current real-time price
+                    real_time_price = get_price(ticker)
+                    if real_time_price and real_time_price > 0:
+                        current_price = real_time_price
                     else:
-                        current_price = 0
+                        # Fallback 2: use the last trade price before end date
+                        ticker_trades = sorted([t for t in filtered_trades if t["product_id"] == ticker], 
+                                             key=lambda x: x["trade_time"], reverse=True)
+                        if ticker_trades:
+                            current_price = float(ticker_trades[0]["price"])
+                        else:
+                            current_price = 0
             else:
                 current_price = 0
             
@@ -259,9 +287,10 @@ def calculate_comparison_by_date(end_date_str, profit_results=None):
             # Get start price
             start_time = min(trades_data["buy_times"]) if trades_data["buy_times"] else None
             if start_time:
-                from calculate_profit_history import get_historical_price_from_candles
+                from calculate_profit_history import get_historical_price_from_candles, get_price
                 start_price = get_historical_price_from_candles(ticker, start_time)
                 if not start_price:
+                    # Fallback to first trade price
                     ticker_trades = sorted([t for t in filtered_trades if t["product_id"] == ticker], key=lambda x: x["trade_time"])
                     if ticker_trades:
                         start_price = float(ticker_trades[0]["price"])
@@ -323,14 +352,21 @@ def calculate_comparison_by_date(end_date_str, profit_results=None):
             else:
                 # Get price at the end date (historical price)
                 if hold_amount > 0:
+                    from calculate_profit_history import get_price
                     current_price = get_historical_price_from_candles(ticker, end_date_iso)
                     if not current_price:
-                        ticker_trades = sorted([t for t in filtered_trades if t["product_id"] == ticker], 
-                                             key=lambda x: x["trade_time"], reverse=True)
-                        if ticker_trades:
-                            current_price = float(ticker_trades[0]["price"])
+                        # Fallback 1: try current real-time price
+                        real_time_price = get_price(ticker)
+                        if real_time_price and real_time_price > 0:
+                            current_price = real_time_price
                         else:
-                            current_price = 0
+                            # Fallback 2: use last trade price
+                            ticker_trades = sorted([t for t in filtered_trades if t["product_id"] == ticker], 
+                                                 key=lambda x: x["trade_time"], reverse=True)
+                            if ticker_trades:
+                                current_price = float(ticker_trades[0]["price"])
+                            else:
+                                current_price = 0
                 else:
                     current_price = 0
                     
